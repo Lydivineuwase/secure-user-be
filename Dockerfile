@@ -14,17 +14,4 @@ RUN ls -la /app/node_modules/.prisma
 # Compile prisma
 RUN npx tsc prisma/seed.ts
 
-# Production stage
-FROM node:22-alpine3.20 AS production
-RUN apk add --no-cache tini
-ENV NODE_ENV=production
-WORKDIR /app
-COPY package*.json ./
-RUN yarn install --production --ignore-scripts --prefer-offline --frozen-lockfile
-COPY --from=development /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=development /app/node_modules/ts-node ./node_modules/ts-node
-COPY --from=development /app/build ./build
-COPY --from=development /app/prisma ./prisma
-
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]
